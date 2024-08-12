@@ -1,0 +1,224 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:validation="http://www.mulesoft.org/schema/mule/validation"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/validation http://www.mulesoft.org/schema/mule/validation/current/mule-validation.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+	<http:request-config name="HTTP_Request_configuration" doc:name="HTTP Request configuration" doc:id="35f64266-94eb-43ff-b835-04a84a14bfef" basePath="/api">
+		<http:request-connection host="localhost" port="3306" />
+	</http:request-config>
+	<flow name="put:\pokemon\(ID)" doc:id="4c935878-2acd-43c3-a0ba-16c8420bafd2" >
+		<flow-ref doc:name="ID" doc:id="ecadb367-18ab-4059-962d-84d7e3df3a7c" name="IDIsNumber"/>
+		<http:request method="PUT" doc:name="Request" doc:id="5e061950-667b-446b-afdc-02585d5829ce" config-ref="HTTP_Request_configuration" path="/pokemon/{ID}" />
+	</flow>
+	<flow name="delete:\pokemon\(ID)" doc:id="4895365f-9572-460e-a23d-f2df2a00a9f6" >
+		<flow-ref doc:name="ID" doc:id="0d6ab949-bc33-4de9-9cf5-da7a90246e06" name="IDIsNumber"/>
+		<http:request method="DELETE" doc:name="Request" doc:id="99a58754-4e3b-4007-94d8-48c51d29aa8d" config-ref="HTTP_Request_configuration" path="/pokemon/{ID}" />
+	</flow>
+	<flow name="patch:\pokemon\(ID)\(generacion)" doc:id="c019eeb3-2976-4aac-bd87-891ea9bde676" >
+		<flow-ref doc:name="ID" doc:id="96e51de3-a4bc-4800-9b0e-72fba1715854" name="IDIsNumber"/>
+		<flow-ref doc:name="Gen" doc:id="021a63be-2bf0-4505-a410-711a9a8e9bce" name="GenIsNumber" />
+		<http:request method="PATCH" doc:name="Request" doc:id="2b2c7098-101b-43dc-a030-97e1f8d3e034" config-ref="HTTP_Request_configuration" path="/pokemon/{ID}/generacion" />
+	</flow>
+	<flow name="patch:\pokemon\(ID)\(nombre)" doc:id="2d78db3b-81e7-4ce1-bc83-fcf29325ea68" >
+		<flow-ref doc:name="ID" doc:id="8573e38d-a5d7-4343-a445-287ef76482eb" name="IDIsNumber" />
+		<flow-ref doc:name="Nombre" doc:id="da4994fa-dd32-43bd-b4c5-15c2984e3806" name="NombreNotNull" />
+		<http:request method="PATCH" doc:name="Request" doc:id="29167e8e-9304-49b8-ad6f-728a5a8e0d55" config-ref="HTTP_Request_configuration" path="/pokemon/{ID}/nombre" />
+	</flow>
+	<flow name="patch:\pokemon\(ID)\(tipo1)" doc:id="070f541f-c03f-42f1-8dc8-c1ac4cee5b0c" >
+		<flow-ref doc:name="ID" doc:id="b817d36d-bac7-4e52-9a40-72b21ef1623b" name="IDIsNumber" />
+		<flow-ref doc:name="Tipo1" doc:id="3e5eb200-1473-4d10-9ee3-846bdabddb73" name="Tipo1NotNull" />
+		<http:request method="PATCH" doc:name="Request" doc:id="977ef422-b564-458a-868b-5a0d16de3e59" config-ref="HTTP_Request_configuration" path="/pokemon/{ID}/tipo1" />
+	</flow>
+	<flow name="patch:\pokemon\(ID)\(tipo2)" doc:id="cf9c1277-2160-48b4-81a3-c4d689080c75" >
+		<flow-ref doc:name="ID" doc:id="2c96f7a5-223e-416f-aaf3-194d3dca2d4e" name="IDIsNumber" />
+		<flow-ref doc:name="Tipo2" doc:id="64a023d4-e75d-4ea6-8ef0-30d0932f4b1b" name="Tipo2NotNull"/>
+		<http:request method="PATCH" doc:name="Request" doc:id="8b705dd6-595c-4860-961a-b05861f7d230" config-ref="HTTP_Request_configuration" path="/pokemon/{ID}/tipo2" />
+	</flow>
+	<flow name="get:\pokemon\(generacion)" doc:id="46a24c60-573e-4e4c-814a-3f2131eff8fd" >
+		<flow-ref doc:name="Gen" doc:id="29582335-6527-4c88-b224-fb4a33f96bc1" name="GenIsNumber"/>
+		<http:request method="GET" doc:name="Request" doc:id="58a716db-d8a6-4cad-a211-25d29de6262c" config-ref="HTTP_Request_configuration" path="/pokemon/generacion" />
+	</flow>
+	<flow name="get:\pokemon\(nombre)" doc:id="6ba385b1-292d-4ecd-9d34-129167ef8ce3" >
+		<flow-ref doc:name="Nombre" doc:id="27eca687-667f-4dca-bcf7-b3b56ad2e96a" name="NombreNotNull"/>
+		<http:request method="GET" doc:name="Request" doc:id="48df4865-8d72-4595-a435-fd0a701c7ec2" config-ref="HTTP_Request_configuration" path="/pokemon/nombre" />
+	</flow>
+	<flow name="get:\pokemon" doc:id="8a7370ec-a047-4ca2-9eb8-3ad29452d303" >
+		<ee:transform doc:name="Transform Message" doc:id="e4f76118-c40f-4992-ab1c-722560728696" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/java
+---
+{
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<http:request method="GET" doc:name="Request" doc:id="c7633310-f223-4c01-a084-44b3390cf86a" config-ref="HTTP_Request_configuration" path="/pokemon" />
+	</flow>
+	<flow name="get:\pokemon\(tipo)" doc:id="c46b361a-c963-4e42-a200-f566d68b8f0b" >
+		<flow-ref doc:name="Tipo" doc:id="6d0c3ed8-04a2-4bd6-a9c6-251a8312ce21" name="TipoNotNull"/>
+		<http:request method="GET" doc:name="Request" doc:id="d05cc841-ed28-4440-bc91-6bc19237c790" config-ref="HTTP_Request_configuration" path="/pokemon/tipo" />
+	</flow>
+	<flow name="get:\pokemon\(ID)" doc:id="c313d842-e07f-4f02-b032-ba7acf093c28" >
+		<flow-ref doc:name="ID" doc:id="0f232e99-e0bf-45cd-af49-9eb202d20507" name="IDIsNumber" />
+		<http:request method="GET" doc:name="Request" doc:id="a726efe9-ccb7-4edb-9954-5e3f8d92c969" config-ref="HTTP_Request_configuration" path="/pokemon/{ID}" />
+	</flow>
+	<flow name="post:\pokemon" doc:id="bbb0093f-772a-4a79-89e0-bbfb88d39aa3" >
+		<flow-ref doc:name="Nombre" doc:id="ec479b76-735a-470b-92b4-2cc9f59238d7" name="NombreNotNull"/>
+		<flow-ref doc:name="Tipo1" doc:id="21c5f16d-a2e5-4ea3-b736-2d79d870431a" name="Tipo1NotNull" />
+		<http:request method="POST" doc:name="Request" doc:id="e43ac8e9-c8ee-4f34-aad4-e4b080b2f77e" config-ref="HTTP_Request_configuration" path="/pokemon" />
+	</flow>
+	<flow name="patch:\pokemon\(ID)\entrenar" doc:id="d9ac3474-cf69-4577-b0ab-603cffca4f92" >
+		<flow-ref doc:name="ID" doc:id="6d04558f-cde8-45ad-8dc1-29af34ecc097" name="IDIsNumber" />
+		<flow-ref doc:name="XP" doc:id="d0421cf7-94e9-477c-aa47-c4434566a857" name="XpIsNumber"/>
+		<http:request method="PATCH" doc:name="Request" doc:id="f8e93fe8-45cb-4abb-a7c5-dc5db9e1fc7f" config-ref="HTTP_Request_configuration" path="/pokemon/{ID}/entrenar" />
+	</flow>
+	<flow name="patch:\pokemon\(ID)\aprender" doc:id="a13a5dc1-cde7-453a-b533-2fa75db81263" >
+		<flow-ref doc:name="Mov" doc:id="b4e6bd92-7aa3-4866-99e1-93191ea02012" name="MovNotNull"/>
+		<http:request method="PATCH" doc:name="Request" doc:id="744d4e66-cbc6-477b-af29-fe0550924852" config-ref="HTTP_Request_configuration" path="/pokemon/{ID}/aprender" />
+	</flow>
+	<flow name="patch:\pokemon\(ID)\olvidar1" doc:id="9864b913-97fe-4bb5-8625-87f72933f3c1" >
+		<flow-ref doc:name="ID" doc:id="8bf8136c-d3d2-43f1-9b73-ed585d47a3b5" name="IDIsNumber" />
+		<flow-ref doc:name="Mov1" doc:id="d1b2edc3-2040-4be4-b58c-f51f0a48da85" name="Mov1NotNull" />
+		<http:request method="PATCH" doc:name="Request" doc:id="1c14195f-fee0-43aa-ad3d-05122171e633" config-ref="HTTP_Request_configuration" path="/pokemon/{ID}/olvidar1" />
+	</flow>
+	<flow name="patch:\pokemon\(ID)\olvidar2" doc:id="ae7ad482-f795-4f4a-a337-3a66a74e1f36" >
+		<flow-ref doc:name="ID" doc:id="385d18db-8276-44fb-88ef-6db4633078ee" name="IDIsNumber" />
+		<flow-ref doc:name="Mov2" doc:id="3e7a0484-5d0d-4df2-a884-8f29ba1587e9" name="Mov2NotNull" />
+		<http:request method="PATCH" doc:name="Request" doc:id="1426ebc0-97b3-459c-8a30-d2a13e1c860e" config-ref="HTTP_Request_configuration" path="/pokemon/{ID}/olvidar2" />
+	</flow>
+	<flow name="patch:\pokemon\(ID)\olvidar3" doc:id="a0d917d3-3cdb-4fdc-baab-15200508e4c8" >
+		<flow-ref doc:name="ID" doc:id="89d49cdd-bb89-4eaa-baba-cd707ce20d2d" name="IDIsNumber" />
+		<flow-ref doc:name="Mov3" doc:id="0a91585a-6d57-4bae-ab37-0b8f4410ac5b" name="Mov3NotNull" />
+		<http:request method="PATCH" doc:name="Request" doc:id="3598b431-8521-472b-9870-491ca60ae1f6" config-ref="HTTP_Request_configuration" path="/pokemon/{ID}/olvidar3" />
+	</flow>
+	<flow name="patch:\pokemon\(ID)\olvidar4" doc:id="1a1e870f-fe8b-4ac1-9071-631dc43d51c0" >
+		<flow-ref doc:name="ID" doc:id="eb9263cd-66ce-4831-9fc9-287cae41b160" name="IDIsNumber" />
+		<flow-ref doc:name="Mov4" doc:id="d83da4e7-6fa9-4841-97c0-7ceabdac1813" name="Mov4NotNull" />
+		<http:request method="PATCH" doc:name="Request" doc:id="7e94f004-162d-4df6-a5f1-b768e4cd2064" config-ref="HTTP_Request_configuration" path="/pokemon/{ID}/olvidar4" />
+	</flow>
+	<flow name="IDIsNumber" doc:id="8ea071cc-9329-4c27-9706-4e21f0751e57" >
+		<set-variable value="#[attributes.uriParams.ID]" doc:name="ID" doc:id="4ab6c5c8-cb02-44fd-a7cb-e48fa92a2fbc" variableName="ID" />
+		<validation:is-number doc:name="ID Is number" doc:id="63056812-b8bb-4bc7-8c7f-533b03836490" value="#[vars.ID]" numberType="INTEGER">
+			<error-mapping sourceType="VALIDATION:INVALID_NUMBER" targetType="ERROR:NOT_NUMBER" />
+		</validation:is-number>
+		<error-handler >
+			<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="6d05faa4-6c31-43da-9f1f-6344120c64c6" type="ERROR:NOT_NUMBER">
+				<set-payload value="El ID del pokemon debe ser un número entero" doc:name="Set Payload" doc:id="1af62fe4-7035-4b38-8b31-2d4ef159b637" />
+			</on-error-propagate>
+		</error-handler>
+	</flow>
+	<flow name="XpIsNumber" doc:id="ef007f3f-0f78-458e-8ba2-3a92f3edd200" >
+		<set-variable value="#[attributes.queryParams.xp]" doc:name="xp" doc:id="3a7d5012-960a-4a8a-ba98-746deffacac9" variableName="xp" />
+		<validation:is-number numberType="INTEGER" doc:name="Is number" doc:id="955bcf95-ff35-4d55-86c6-12194cd08727" value="#[attributes.queryParams.xp]">
+			<error-mapping sourceType="VALIDATION:INVALID_NUMBER" targetType="ERROR:XP_NOT_NUMBER" />
+		</validation:is-number>
+		<error-handler >
+			<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="630d559f-6013-4706-8681-0fe0ae1ee023" type="ERROR:XP_NOT_NUMBER">
+				<set-payload value="La xp entrenada debe ser un número entero" doc:name="Set Payload" doc:id="6d1522f1-2f82-488d-b66c-3591f40f704b" />
+			</on-error-propagate>
+		</error-handler>
+	</flow>
+	<flow name="NombreNotNull" doc:id="f907f372-043e-4ffe-a119-8f893db320e1" >
+		<validation:is-not-null doc:name="Is not null" doc:id="7cb9661b-e4d2-4b4d-9c59-67ba4980d5ad" value="#[attributes.queryParams.nombre]" >
+			<error-mapping sourceType="VALIDATION:NULL" targetType="ERROR:IS_NULL" />
+		</validation:is-not-null>
+		<error-handler >
+			<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="cc6da76e-e2e2-4aa3-ae77-9b4c600641e6" type="ERROR:IS_NULL" >
+				<set-payload value="El nombre no puede ser Null" doc:name="Set Payload" doc:id="18c9e8df-dd4b-4df9-9962-e59430c1de80" />
+			</on-error-propagate>
+		</error-handler>
+	</flow>
+	<flow name="Tipo1NotNull" doc:id="6abcd316-3c6f-450e-8948-094c11a8f3ee" >
+		<validation:is-not-null doc:name="Is not null" doc:id="57b1ee12-9b27-451a-928c-7edd2a03ad30" value="#[attributes.queryParams.tipo1]" >
+			<error-mapping sourceType="VALIDATION:NULL" targetType="ERROR:IS_NULL" />
+		</validation:is-not-null>
+		<error-handler >
+			<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="90a5b838-c0bc-4e13-9a76-bf0f9285727e" type="ERROR:IS_NULL" >
+				<set-payload value="El tipo1 no puede ser Null" doc:name="Set Payload" doc:id="f063cf70-2b32-4850-814e-1870e30ea693" />
+			</on-error-propagate>
+		</error-handler>
+	</flow>
+	<flow name="Tipo2NotNull" doc:id="3dd08ece-d431-4bb4-81f3-5e88b5abfc6f" >
+		<validation:is-not-null doc:name="Is not null" doc:id="ee57f7e5-b8e1-41d0-ad6b-5a2aef26e858" value="#[attributes.queryParams.tipo2]" >
+			<error-mapping sourceType="VALIDATION:NULL" targetType="ERROR:IS_NULL" />
+		</validation:is-not-null>
+		<error-handler >
+			<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="de315481-0944-4911-b5d8-d0f8484bf7bd" type="ERROR:IS_NULL" >
+				<set-payload value="El tipo2 no puede ser Null" doc:name="Set Payload" doc:id="6aa7ecd7-e7cb-4eac-825d-532f4d414b3f" />
+			</on-error-propagate>
+		</error-handler>
+	</flow>
+	<flow name="Mov1NotNull" doc:id="603d37db-e1e9-4638-a23c-f7e64f6b73e8" >
+		<validation:is-not-null doc:name="Is not null" doc:id="bf451176-2701-44a9-9162-9f1aa767a6a8" value="#[attributes.queryParams.mov1]" >
+			<error-mapping sourceType="VALIDATION:NULL" targetType="ERROR:IS_NULL" />
+		</validation:is-not-null>
+		<error-handler >
+			<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="eb60da52-68ed-47ca-996c-65b682eade20" type="ERROR:IS_NULL" >
+				<set-payload value="El movimiento no puede ser Null, para olvidar el movimiento debe usar Olvidar" doc:name="Set Payload" doc:id="e4b416b9-7162-45ac-9dbd-3ede3cae03e7" />
+			</on-error-propagate>
+		</error-handler>
+	</flow>
+	<flow name="Mov2NotNull" doc:id="a99e5405-ea3c-4a73-a807-8b76cb54f581" >
+		<validation:is-not-null doc:name="Is not null" doc:id="a340d86c-6482-465d-b73a-78df0559578d" value="#[attributes.queryParams.mov2]" >
+			<error-mapping sourceType="VALIDATION:NULL" targetType="ERROR:IS_NULL" />
+		</validation:is-not-null>
+		<error-handler >
+			<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="e3232126-d3b2-4c11-af6c-6122e3187a18" type="ERROR:IS_NULL" >
+				<set-payload value="El movimiento no puede ser Null, para olvidar el movimiento debe usar Olvidar" doc:name="Set Payload" doc:id="a121dd4d-7dba-44c6-81ad-94f29e62fe71" />
+			</on-error-propagate>
+		</error-handler>
+	</flow>
+	<flow name="Mov3NotNull" doc:id="00aa4363-8ffa-4287-8079-8ee1a394837a" >
+		<validation:is-not-null doc:name="Is not null" doc:id="31959f79-e4ff-43f3-bf9d-4c9a2daba42f" value="#[attributes.queryParams.mov3]" >
+			<error-mapping sourceType="VALIDATION:NULL" targetType="ERROR:IS_NULL" />
+		</validation:is-not-null>
+		<error-handler >
+			<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="e6622ba3-c6b6-40bd-96f1-92d6b563fe33" type="ERROR:IS_NULL" >
+				<set-payload value="El movimiento no puede ser Null, para olvidar el movimiento debe usar Olvidar" doc:name="Set Payload" doc:id="7aee5082-5c7b-47a3-a9cb-9d5d25a4c415" />
+			</on-error-propagate>
+		</error-handler>
+	</flow>
+	<flow name="Mov4NotNull" doc:id="32cb3019-dba1-4709-bba8-b94f833adc31" >
+		<validation:is-not-null doc:name="Is not null" doc:id="46dbeeb9-f60d-4ddb-b562-e4b6a0adcaf7" value="#[attributes.queryParams.mov4]" >
+			<error-mapping sourceType="VALIDATION:NULL" targetType="ERROR:IS_NULL" />
+		</validation:is-not-null>
+		<error-handler >
+			<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="ac324f76-e9d0-4bf3-98b9-22d8105b03a6" type="ERROR:IS_NULL" >
+				<set-payload value="El movimiento no puede ser Null, para olvidar el movimiento debe usar Olvidar" doc:name="Set Payload" doc:id="f6ee9d5f-2f13-4d5e-8e64-31197d546b19" />
+			</on-error-propagate>
+		</error-handler>
+	</flow>
+	<flow name="GenIsNumber" doc:id="e5021e40-774e-4358-8102-a55ad5eb2bea" >
+		<validation:is-number numberType="INTEGER" doc:name="Is number" doc:id="62b6f8bb-1ebe-4fbd-a078-729f61b6ba55" value="#[attributes.queryParams.gen]" >
+			<error-mapping sourceType="VALIDATION:INVALID_NUMBER" targetType="ERROR:XP_NOT_NUMBER" />
+		</validation:is-number>
+		<error-handler >
+			<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="cf925e19-403c-49c2-9fb0-44119ec9632a" type="ERROR:XP_NOT_NUMBER" >
+				<set-payload value="La generación del pokemon debe ser un número entero" doc:name="Set Payload" doc:id="bf0c017a-270e-4268-ab87-75d9e9517988" />
+			</on-error-propagate>
+		</error-handler>
+	</flow>
+	<flow name="TipoNotNull" doc:id="a62dddcd-646b-4386-aace-38c676dbf2c5" >
+		<validation:is-not-null doc:name="Is not null" doc:id="33413cc3-57e9-4f90-bef6-0ffd7eb54b79" value="#[attributes.queryParams.tipo]" >
+			<error-mapping sourceType="VALIDATION:NULL" targetType="ERROR:IS_NULL" />
+		</validation:is-not-null>
+		<error-handler >
+			<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="50ead7fa-e2e6-466c-8490-51b7423b18e0" type="ERROR:IS_NULL" >
+				<set-payload value="El tipo1 no puede ser Null" doc:name="Set Payload" doc:id="6b63f557-9b92-4813-8c90-94bd1431f3f6" />
+			</on-error-propagate>
+		</error-handler>
+	</flow>
+	<flow name="MovNotNull" doc:id="39598a4c-555a-402e-a77d-f9fb76a913aa" >
+		<validation:is-not-null doc:name="Is not null" doc:id="3c1013b0-9b80-48b8-9670-8e9c2df8fc5c" value="#[attributes.queryParams.mov]" >
+			<error-mapping sourceType="VALIDATION:NULL" targetType="ERROR:IS_NULL" />
+		</validation:is-not-null>
+		<error-handler >
+			<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="d8efd3fd-5552-4b66-bb5e-fdee216fe682" type="ERROR:IS_NULL" >
+				<set-payload value="El movimiento no puede ser Null, para olvidar el movimiento debe usar Olvidar" doc:name="Set Payload" doc:id="6c6737f5-c7b7-4596-a535-4481bb464b3e" />
+			</on-error-propagate>
+		</error-handler>
+	</flow>
+</mule>

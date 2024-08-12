@@ -1,0 +1,268 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:apikit="http://www.mulesoft.org/schema/mule/mule-apikit" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/mule/mule-apikit/current/mule-apikit.xsd http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd ">
+    <http:listener-config name="pokemonbbdd-httpListenerConfig">
+        <http:listener-connection host="0.0.0.0" port="8081" />
+    </http:listener-config>
+    <apikit:config name="pokemonbbdd-config" api="resource::ab3fc5d3-4ae6-4633-8148-cc4da06d9c56:pokemonbbdd:1.0.6:raml:zip:pokemonbbdd.raml" outboundHeadersMapName="outboundHeaders" httpStatusVarName="httpStatus" >
+		<apikit:flow-mappings >
+			<apikit:flow-mapping resource="/pokemon/{ID}" action="put" flow-ref="put:\pokemon\(ID):pokemonbbdd-config" />
+			<apikit:flow-mapping resource="/pokemon/{ID}" action="delete" flow-ref="delete:\pokemon\(ID)\generacion:pokemonbbdd-config" />
+			<apikit:flow-mapping resource="/pokemon/{ID}/generacion" action="patch" flow-ref="patch:\pokemon\(ID)\generacion:pokemonbbdd-config" />
+			<apikit:flow-mapping resource="/pokemon/{ID}/nombre" action="patch" flow-ref="patch:\pokemon\(ID)\nombre:pokemonbbdd-config" />
+			<apikit:flow-mapping resource="/pokemon/{ID}/tipo1" action="patch" flow-ref="patch:\pokemon\(ID)\tipo1:pokemonbbdd-config" />
+			<apikit:flow-mapping resource="/pokemon/{ID}/tipo2" action="patch" flow-ref="patch:\pokemon\(ID)\tipo2:pokemonbbdd-config" />
+			<apikit:flow-mapping resource="/pokemon/generacion" action="get" flow-ref="get:\pokemon\generacion:pokemonbbdd-config" />
+			<apikit:flow-mapping resource="/pokemon/nombre" action="get" flow-ref="get:\pokemon\nombre:pokemonbbdd-config" />
+			<apikit:flow-mapping resource="/pokemon" action="get" flow-ref="get:\pokemon:pokemonbbdd-config" />
+			<apikit:flow-mapping resource="/pokemon/tipo" action="get" flow-ref="get:\pokemon\tipo:pokemonbbdd-config" />
+			<apikit:flow-mapping resource="/pokemon/{ID}" action="get" flow-ref="get:\pokemon\(ID):pokemonbbdd-config" />
+			<apikit:flow-mapping resource="/pokemon" action="post" flow-ref="post:\pokemon:pokemonbbdd-config" />
+			<apikit:flow-mapping resource="/pokemon/{ID}/entrenar" action="patch" flow-ref="patch:\pokemon\(ID)\entrenar:pokemonbbdd-config" />
+			<apikit:flow-mapping resource="/pokemon/{ID}/aprender" action="patch" flow-ref="patch:\pokemon\(ID)\aprender:pokemonbbdd-config" />
+			<apikit:flow-mapping resource="/pokemon/{ID}/olvidar1" action="patch" flow-ref="patch:\pokemon\(ID)\olvidar1:pokemonbbdd-config" />
+			<apikit:flow-mapping resource="/pokemon/{ID}/olvidar2" action="patch" flow-ref="patch:\pokemon\(ID)\olvidar2:pokemonbbdd-config" />
+			<apikit:flow-mapping resource="/pokemon/{ID}/olvidar3" action="patch" flow-ref="patch:\pokemon\(ID)\olvidar3:pokemonbbdd-config" />
+			<apikit:flow-mapping resource="/pokemon/{ID}/olvidar4" action="patch" flow-ref="patch:\pokemon\(ID)\olvidar4:pokemonbbdd-config" />
+		</apikit:flow-mappings>
+	</apikit:config>
+    <flow name="pokemonbbdd-main">
+        <http:listener config-ref="pokemonbbdd-httpListenerConfig" path="/api/*">
+            <http:response statusCode="#[vars.httpStatus default 200]">
+                <http:headers>#[vars.outboundHeaders default {}]</http:headers>
+            </http:response>
+            <http:error-response statusCode="#[vars.httpStatus default 500]">
+                <http:body>#[payload]</http:body>
+                <http:headers>#[vars.outboundHeaders default {}]</http:headers>
+            </http:error-response>
+        </http:listener>
+        <apikit:router config-ref="pokemonbbdd-config" />
+        <error-handler>
+            <on-error-propagate type="APIKIT:BAD_REQUEST">
+                <ee:transform doc:name="Transform Message">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Bad request"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">400</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+            <on-error-propagate type="APIKIT:NOT_FOUND">
+                <ee:transform doc:name="Transform Message">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Resource not found"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">404</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+            <on-error-propagate type="APIKIT:METHOD_NOT_ALLOWED">
+                <ee:transform doc:name="Transform Message">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Method not allowed"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">405</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+            <on-error-propagate type="APIKIT:NOT_ACCEPTABLE">
+                <ee:transform doc:name="Transform Message">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Not acceptable"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">406</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+            <on-error-propagate type="APIKIT:UNSUPPORTED_MEDIA_TYPE">
+                <ee:transform doc:name="Transform Message">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Unsupported media type"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">415</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+            <on-error-propagate type="APIKIT:NOT_IMPLEMENTED">
+                <ee:transform doc:name="Transform Message">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Not Implemented"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">501</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+        </error-handler>
+    </flow>
+    <flow name="pokemonbbdd-console">
+        <http:listener config-ref="pokemonbbdd-httpListenerConfig" path="/console/*">
+            <http:response statusCode="#[vars.httpStatus default 200]">
+                <http:headers>#[vars.outboundHeaders default {}]</http:headers>
+            </http:response>
+            <http:error-response statusCode="#[vars.httpStatus default 500]">
+                <http:body>#[payload]</http:body>
+                <http:headers>#[vars.outboundHeaders default {}]</http:headers>
+            </http:error-response>
+        </http:listener>
+        <apikit:console config-ref="pokemonbbdd-config" />
+        <error-handler>
+            <on-error-propagate type="APIKIT:NOT_FOUND">
+                <ee:transform doc:name="Transform Message">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Resource not found"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">404</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+        </error-handler>
+    </flow>
+	<flow name="put:\pokemon\(ID):pokemonbbdd-config" doc:id="c0e25c5f-24dc-4d3d-a4b0-0ecc3207b61f" >
+		<ee:transform doc:name="Transform Message" doc:id="c9885a00-f891-4a8e-b0be-02405b33b51c" >
+			<ee:variables >
+				<ee:set-variable variableName="ID" ><![CDATA[attributes.uriParams.'ID']]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<set-variable value="#[attributes.uriParams.ID]" doc:name="Set Variable" doc:id="e5ed4785-cbed-47cf-a2d7-6bc16ba56f41" variableName="ID"/>
+		<logger level="INFO" doc:name="Logger" doc:id="8a2ffa5c-6a13-4527-9497-fda2ea57621b" message="put:\pokemon\(ID):pokemonbbdd-config" />
+		<flow-ref doc:name="Flow Reference" doc:id="2883c769-e493-4ab7-b358-963aa6a985d8" name="put:\pokemon\(ID)" />
+	</flow>
+	<flow name="delete:\pokemon\(ID):pokemonbbdd-config" doc:id="bb1f9227-07d7-4cfe-9689-cd47383459b4" >
+		<ee:transform doc:name="Transform Message" doc:id="d9d1b8bc-2abe-405d-8923-603e297048fe" >
+			<ee:variables >
+				<ee:set-variable variableName="ID" ><![CDATA['ID' : attributes.uriParams.ID]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<set-variable value="#[attributes.uriParams.ID]" doc:name="Set Variable" doc:id="d3fe887b-225d-4e5d-80a9-a90c3504ebbb" variableName="ID" />
+		<logger level="INFO" doc:name="Logger" doc:id="19b9dc98-a3d4-4f61-886e-0d86f9d1b337" message="delete:\pokemon\(ID):pokemonbbdd-config" />
+		<flow-ref doc:name="Flow Reference" doc:id="825ac5e7-a753-4064-a5e6-8cc992e89055" name="delete:\pokemon\(ID)" />
+	</flow>
+	<flow name="patch:\pokemon\(ID)\generacion:pokemonbbdd-config" doc:id="f98678c2-3d68-4693-a786-341df649ff7e" >
+		<ee:transform doc:name="Transform Message" doc:id="5bc31e73-12c1-4868-8d8b-d2f1d3f2aaf2" >
+			<ee:variables >
+				<ee:set-variable variableName="ID" ><![CDATA[attributes.uriParams.'ID']]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<set-variable value="#[attributes.uriParams.ID]" doc:name="Set Variable" doc:id="fed932d1-652d-4719-9596-0d6b6a2d88db" variableName="ID" />
+		<logger level="INFO" doc:name="Logger" doc:id="50edb9a4-05a6-4446-8c6f-e7508f3b6ea5" message="patch:\pokemon\(ID)\generacion:pokemonbbdd-config" />
+		<flow-ref doc:name="Flow Reference" doc:id="c0f8a43e-3575-4f31-803f-fb78f6fa1d56" name="patch:\pokemon\(ID)\(generacion)" />
+	</flow>
+	<flow name="patch:\pokemon\(ID)\nombre:pokemonbbdd-config" doc:id="cd842a03-a229-4b57-9ee0-8469e9f23f6e" >
+		<ee:transform doc:name="Transform Message" doc:id="6838391e-d575-4fb3-9335-008d7281ec2a" >
+			<ee:variables >
+				<ee:set-variable variableName="ID" ><![CDATA[attributes.uriParams.'ID']]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<set-variable value="#[attributes.uriParams.ID]" doc:name="Set Variable" doc:id="382b3b0a-6424-4fec-9f61-06da5f38f86a" variableName="ID" />
+		<logger level="INFO" doc:name="Logger" doc:id="005afc89-a88e-4678-9253-25c508063622" message="patch:\pokemon\(ID)\nombre:pokemonbbdd-config" />
+		<flow-ref doc:name="Flow Reference" doc:id="55fa4ae0-618a-40cf-be13-df0eb0672da4" name="patch:\pokemon\(ID)\(nombre)" />
+	</flow>
+	<flow name="patch:\pokemon\(ID)\tipo1:pokemonbbdd-config" doc:id="b89dffc9-4a0b-4eb3-be7f-47801c3fc0bf" >
+		<ee:transform doc:name="Transform Message" doc:id="72bb8c58-c725-4564-9e62-cfad97d417f1" >
+			<ee:variables >
+				<ee:set-variable variableName="ID" ><![CDATA[attributes.uriParams.'ID']]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<set-variable value="#[attributes.uriParams.ID]" doc:name="Set Variable" doc:id="00b0affa-af81-48ba-8d59-ff99fd66b059" variableName="ID" />
+		<logger level="INFO" doc:name="Logger" doc:id="0626f254-96d6-4468-bcd4-aba4c7be369e" message="patch:\pokemon\(ID)\tipo1:pokemonbbdd-config" />
+		<flow-ref doc:name="Flow Reference" doc:id="1b8737db-caf9-49b8-9bda-05d19ca25e98" name="patch:\pokemon\(ID)\(tipo1)" />
+	</flow>
+	<flow name="patch:\pokemon\(ID)\tipo2:pokemonbbdd-config" doc:id="062423d5-7140-4590-bb92-9f9d3f8d9ade" >
+		<ee:transform doc:name="Transform Message" doc:id="682bd011-cd0a-428e-b5ec-fbe18a106814" >
+			<ee:variables >
+				<ee:set-variable variableName="ID" ><![CDATA[attributes.uriParams.'ID']]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<set-variable value="#[attributes.uriParams.ID]" doc:name="Set Variable" doc:id="913dae9c-e258-48d9-bb6a-c015cf3a4a7a" variableName="ID" />
+		<logger level="INFO" doc:name="Logger" doc:id="324d6e3f-5d65-4076-b473-499025592d7b" message="patch:\pokemon\(ID)\tipo2:pokemonbbdd-config" />
+		<flow-ref doc:name="Flow Reference" doc:id="28d3d035-f50c-4ddf-ba4f-266191e04778" name="patch:\pokemon\(ID)\(tipo2)" />
+	</flow>
+	<flow name="get:\pokemon\generacion:pokemonbbdd-config" doc:id="72757dc0-6679-447d-bf26-dc199c5ffc69" >
+		<logger level="INFO" doc:name="Logger" doc:id="8fd78d3e-3eeb-49a3-9d59-8f058ac9626f" message="get:\pokemon\generacion:pokemonbbdd-config" />
+		<flow-ref doc:name="Flow Reference" doc:id="8e474c4f-5916-4645-9379-03455a548669" name="get:\pokemon\(generacion)" />
+	</flow>
+	<flow name="get:\pokemon\nombre:pokemonbbdd-config" doc:id="69d1a6d7-e072-4052-85e2-0921fc4004cb" >
+		<logger level="INFO" doc:name="Logger" doc:id="dae72c99-e62f-4a4f-bf5b-d2264d43e2cf" message="get:\pokemon\nombre:pokemonbbdd-config" />
+		<flow-ref doc:name="Flow Reference" doc:id="3da5059f-cec9-428e-aef4-6923602cf571" name="get:\pokemon\(nombre)" />
+	</flow>
+	<flow name="get:\pokemon:pokemonbbdd-config" doc:id="501af33a-8d29-423e-b7e7-69cc7c02ebbe" >
+		<logger level="INFO" doc:name="Logger" doc:id="e5b42040-c63d-4c24-addb-6a42a623c201" message="get:\pokemon:pokemonbbdd-config" />
+		<flow-ref doc:name="Flow Reference" doc:id="4abb0321-f83f-4233-8bd9-e9e90da1bcbb" name="get:\pokemon" />
+	</flow>
+	<flow name="get:\pokemon\tipo:pokemonbbdd-config" doc:id="1c2899b3-766d-4cf1-a75f-4cd2c2e116ad" >
+		<logger level="INFO" doc:name="Logger" doc:id="3b597268-248c-469e-a30e-7aab64f163c0" message="get:\pokemon\tipo:pokemonbbdd-config" />
+		<flow-ref doc:name="Flow Reference" doc:id="13b8295b-41c6-4684-bc83-ca6bed59b8ad" name="get:\pokemon\(tipo)" />
+	</flow>
+	<flow name="get:\pokemon\(ID):pokemonbbdd-config" doc:id="e394fc37-bdbe-444e-ba57-937079b74ad5" >
+		<ee:transform doc:name="Transform Message" doc:id="2eb4cd0d-9abf-4a0c-a44c-b92b021889cc" >
+			<ee:variables >
+				<ee:set-variable variableName="ID" ><![CDATA[output application/java
+---
+attributes.uriParams.'ID']]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<set-variable value="#[attributes.uriParams.ID]" doc:name="Set Variable" doc:id="c8a9951b-ce6a-4916-acf0-489e6bd40593" variableName="ID" />
+		<logger level="INFO" doc:name="Logger" doc:id="c00a16da-36ac-4e04-b306-2ccbcb6fb261" message="get:\pokemon\(ID):pokemonbbdd-config" />
+		<flow-ref doc:name="Flow Reference" doc:id="a705aff7-27e5-45e6-8c28-c3689c7fa652" name="get:\pokemon\(ID)" />
+	</flow>
+	<flow name="post:\pokemon:pokemonbbdd-config" doc:id="8a749c5f-d6c9-4a9e-9000-d50d014e94ed" >
+		<logger level="INFO" doc:name="Logger" doc:id="838db4a8-a73b-4e22-9223-6872950af89d" message="post:\pokemon:pokemonbbdd-config" />
+		<flow-ref doc:name="Flow Reference" doc:id="8c9c8421-e93d-4eec-9eea-76ae88b1b1b6" name="post:\pokemon" />
+	</flow>
+	<flow name="patch:\pokemon\(ID)\entrenar:pokemonbbdd-config" doc:id="864b4a66-df45-4024-a5ff-b72a515d9985" >
+		<logger level="INFO" doc:name="Logger" doc:id="20ff39d9-39a8-4fbd-a28a-9c5a6e682c1b" message="post:\pokemon:pokemonbbdd-config" />
+		<flow-ref doc:name="Flow Reference" doc:id="bc6712fc-1b20-4807-a9e9-41cda3d37341" name="patch:\pokemon\(ID)\entrenar" />
+	</flow>
+	<flow name="patch:\pokemon\(ID)\aprender:pokemonbbdd-config" doc:id="e0de4a04-96b0-40d5-b8a7-b630f1620c65" >
+		<logger level="INFO" doc:name="Logger" doc:id="ed9adc17-2c4b-4a70-a706-808633761413" message="post:\pokemon:pokemonbbdd-config" />
+		<set-variable value="#[attributes.uriParams.ID]" doc:name="Set Variable" doc:id="69ee6210-c834-4ff6-a269-8e5a06cea037" variableName="ID" />
+		<flow-ref doc:name="Flow Reference" doc:id="bc78011d-a6cb-4410-844b-4a21cf8e3bee" name="patch:\pokemon\(ID)\aprender" />
+	</flow>
+	<flow name="patch:\pokemon\(ID)\olvidar1:pokemonbbdd-config" doc:id="c4e0ccdc-4f60-4dea-8588-df9765f29d35" >
+		<logger level="INFO" doc:name="Logger" doc:id="b3c757b3-fa87-4b54-8df5-42de02068646" message="post:\pokemon:pokemonbbdd-config" />
+		<set-variable value="#[attributes.uriParams.ID]" doc:name="Set Variable" doc:id="6c602282-09dd-4fe3-ab00-521061050ae2" variableName="ID" />
+		<flow-ref doc:name="Flow Reference" doc:id="09d3594a-6e7c-4d92-80ef-bf90000c15f8" name="patch:\pokemon\(ID)\olvidar1" />
+	</flow>
+	<flow name="patch:\pokemon\(ID)\olvidar2:pokemonbbdd-config" doc:id="f011231e-9be3-40d9-9fc0-9746181ec64c" >
+		<logger level="INFO" doc:name="Logger" doc:id="bf01a6f4-eb7a-4416-81f3-019499c81b8a" message="post:\pokemon:pokemonbbdd-config" />
+		<set-variable value="#[attributes.uriParams.ID]" doc:name="Set Variable" doc:id="2faf9476-a418-4bbe-ba91-4e4eda8b421b" variableName="ID" />
+		<flow-ref doc:name="Flow Reference" doc:id="94245ca6-cb9a-4dad-9654-b1a147c3d8d8" name="patch:\pokemon\(ID)\olvidar2" />
+	</flow>
+	<flow name="patch:\pokemon\(ID)\olvidar3:pokemonbbdd-config" doc:id="7468df8a-791e-4afb-b48a-4a50e53813e3" >
+		<logger level="INFO" doc:name="Logger" doc:id="65078ed9-0d1e-4784-aa2c-38367779563d" message="post:\pokemon:pokemonbbdd-config" />
+		<set-variable value="#[attributes.uriParams.ID]" doc:name="Set Variable" doc:id="0b3c73a0-26ba-405e-ad9f-e72a8a6dbe29" variableName="ID" />
+		<flow-ref doc:name="Flow Reference" doc:id="d055e1b1-a528-4d9f-9e8b-1305803ad90d" name="patch:\pokemon\(ID)\olvidar3" />
+	</flow>
+	<flow name="patch:\pokemon\(ID)\olvidar4:pokemonbbdd-config" doc:id="ffce938b-816e-4e03-98a8-197ad2126a52" >
+		<logger level="INFO" doc:name="Logger" doc:id="99774ddb-5d55-4837-af1c-5b7614099f0a" message="post:\pokemon:pokemonbbdd-config" />
+		<set-variable value="#[attributes.uriParams.ID]" doc:name="Set Variable" doc:id="1292ed7c-e330-496b-ae6d-3cdcffcb7244" variableName="ID" />
+		<flow-ref doc:name="Flow Reference" doc:id="f92fe15b-28c6-4297-8c08-989790c69af8" name="patch:\pokemon\(ID)\olvidar4" />
+	</flow>
+</mule>
